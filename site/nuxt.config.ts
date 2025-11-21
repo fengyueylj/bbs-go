@@ -93,7 +93,7 @@ export default defineNuxtConfig({
       { code: 'en-US', language: 'en-US', file: "en-US.js" },
       { code: 'zh-CN', language: 'zh-CN', file: "zh-CN.js" }
     ],
-    defaultLocale: 'en-US',
+    defaultLocale: 'zh-CN',
     strategy: 'no_prefix',
     detectBrowserLanguage: false,
     lazy: false,

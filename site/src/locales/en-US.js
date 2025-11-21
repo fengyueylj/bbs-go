@@ -1,6 +1,7 @@
 export default {
   common: {
     noData: "No data available",
+    topicCategories: "Topic Categories",
     createBtn: {
       create: "Create",
       tweet: "Tweet",

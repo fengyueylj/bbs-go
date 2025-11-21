@@ -1,6 +1,7 @@
 export default {
   common: {
     noData: "暂无数据",
+    topicCategories: "主题分类",
     createBtn: {
       create: "发表",
       tweet: "发动态",

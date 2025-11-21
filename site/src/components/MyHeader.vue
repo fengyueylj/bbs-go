@@ -27,6 +27,40 @@
       </div>
       <div :class="{ 'is-active': navbarActive }" class="navbar-menu">
         <div class="navbar-start">
+          <!-- Topics Nav Dropdown -->
+          <div class="navbar-item has-dropdown is-hoverable">
+            <div class="navbar-link">
+              <i class="iconfont icon-category"></i>
+              <span >{{ $t('common.topicCategories') }}</span>
+            </div>
+            <div class="navbar-dropdown">
+              <nuxt-link
+                v-for="node in nodes"
+                :key="node.id"
+                :to="nodeUrl(node)"
+                :class="['navbar-item', { active: envStore.currentNodeId === node.id, 'hovered': hoveredNode === node.id }]"
+                @mouseenter="hoveredNode = node.id"
+                @mouseleave="hoveredNode = null"
+                style="transition: all 0.2s ease"
+              >
+                <!-- 为所有选项预留图标位置，确保名称对齐 -->
+                <div style="width: 16px; height: 16px; margin-right: 8px; flex-shrink: 0;">
+                  <!-- 只在选中或悬停状态显示分类图标 -->
+                  <i v-if="envStore.currentNodeId === node.id || hoveredNode === node.id" 
+                     class="iconfont icon-category node-active-icon"></i>
+                  <!-- 只在有logo时显示logo -->
+                  <img
+                    v-else-if="node.logo"
+                    :src="node.logo"
+                    class="node-logo-dropdown"
+                    :alt="node.name"
+                    style="width: 100%; height: 100%;"
+                  />
+                </div>
+                <span class="node-name-dropdown">{{ node.name }}</span>
+              </nuxt-link>
+            </div>
+          </div>
           <nuxt-link
             v-for="(nav, index) in config.siteNavs"
             :key="index"
@@ -96,14 +130,25 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import iconNew from "~/assets/images/new.png";
+import iconRecommend from "~/assets/images/recommend.png";
+import iconFeed from "~/assets/images/feed.png";
+import iconNode from "~/assets/images/node.png";
+
 const userStore = useUserStore();
 const configStore = useConfigStore();
+const envStore = useEnvStore();
+const router = useRouter();
 
 const { user } = storeToRefs(userStore);
 const { config } = storeToRefs(configStore);
 const { t } = useI18n();
 
 const navbarActive = ref(false);
+const hoveredNode = ref(null);
+const { data: nodes } = await useMyFetch("/api/topic/node_navs");
 
 function toggleNav() {
   navbarActive.value = !navbarActive.value;
@@ -114,6 +159,34 @@ async function signout() {
     await userStore.signout();
     useLinkTo("/");
   }
+}
+
+function nodeUrl(node) {
+  if (node.id > 0) {
+    return `/topics/node/${node.id}`;
+  } else if (node.id === 0) {
+    return "/topics/node/newest";
+  } else if (node.id === -1) {
+    return "/topics/node/recommend";
+  } else if (node.id === -2) {
+    return "/topics/node/feed";
+  }
+  return "/";
+}
+
+function selectNode(nodeId) {
+  envStore.setCurrentNodeId(nodeId);
+}
+
+function getNodeIconClass(nodeId) {
+  if (nodeId === 0) {
+    return 'iconfont icon-new';
+  } else if (nodeId === -1) {
+    return 'iconfont icon-recommend';
+  } else if (nodeId === -2) {
+    return 'iconfont icon-feed';
+  }
+  return 'iconfont icon-category';
 }
 </script>
 
@@ -184,5 +257,85 @@ async function signout() {
       }
     }
   }
+}
+
+/* Topics Nav Dropdown Styles */
+.navbar-dropdown {
+  width: 220px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.node-logo-dropdown {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.node-icon-dropdown {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.node-active-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  flex-shrink: 0;
+  color: #4a6cf7; /* 使用品牌色突出显示选中状态 */
+  font-size: 16px;
+}
+
+/* 悬停状态的样式增强 */
+.navbar-dropdown .navbar-item:hover,
+.navbar-item.hovered {
+  background-color: rgba(74, 108, 247, 0.08);
+  padding-left: 12px;
+  border-radius: 4px;
+}
+
+.node-name-dropdown {
+  font-size: 14px;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.navbar-dropdown a.active {
+  background-color: var(--primary-50);
+  color: var(--primary-6);
+  font-weight: 500;
+}
+
+.navbar-dropdown a:hover {
+  background-color: var(--bg-color-light);
+}
+
+/* Custom scrollbar for dropdown */
+.navbar-dropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.navbar-dropdown::-webkit-scrollbar-track {
+  background: var(--bg-color-light);
+}
+
+.navbar-dropdown::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+.navbar-dropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--text-color-light);
 }
 </style>

@@ -2,9 +2,7 @@
   <section class="main">
     <div class="container main-container">
       <div class="main-content no-padding no-bg topics-wrapper">
-        <div class="topics-nav">
-          <topics-nav />
-        </div>
+
         <div class="topics-main">
           <!-- <div class="topics-main-header">
             <div>ALL</div>
@@ -42,7 +40,7 @@ onMounted(() => {
 });
 
 useHead({
-  title: useSiteTitle(node.value.name, t("pages.topics.title")),
+  title: useSiteTitle(node.value?.name || '', t("pages.topics.title")),
   meta: [
     {
       hid: "description",
