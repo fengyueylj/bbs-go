@@ -155,36 +155,46 @@ const toTopicDetail = (topicId) => {
 <style lang="scss" scoped>
 .topic-list {
   .topic-item {
-    padding: 16px 32px;
-    position: relative;
+    background-color: var(--bg-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     overflow: hidden;
-    border-radius: 3px;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    padding: 0;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
 
     &:not(:last-child):after {
-      position: absolute;
-      content: "";
-      bottom: 0;
-      left: 32px;
-      right: 32px;
-      height: 1px;
-      background: var(--border-color4);
+      display: none;
     }
 
     .topic-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 1.2rem;
+      border-bottom: 1px solid var(--border-color);
 
       .topic-header-main {
         display: flex;
         align-items: center;
+        gap: 10px;
 
         .topic-userinfo {
-          margin-left: 10px;
+          margin-left: 0;
           .topic-nickname {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 14px;
             color: var(--text-color);
+            transition: color 0.2s ease;
+
+            &:hover {
+              color: var(--text-link-color);
+            }
           }
 
           .topic-time {
@@ -199,43 +209,48 @@ const toTopicDetail = (topicId) => {
         .topic-sticky-icon {
           font-size: 13px;
           line-height: 13px;
-          color: #ff7827;
-          background: #ffe7d9;
-          border-radius: 2px;
-          padding: 3px 6px;
+          color: white;
+          background: linear-gradient(135deg, #ff7827, #ff9e5f);
+          border-radius: 50px;
+          padding: 4px 12px;
           white-space: nowrap;
+          font-weight: 600;
         }
       }
     }
 
     .topic-content {
-      margin-top: 6px;
+      margin-top: 0;
+      padding: 1.2rem;
+      
       .topic-title {
         display: inline-block;
-        margin-bottom: 6px;
+        margin-bottom: 0.8rem;
         word-wrap: break-word;
         word-break: break-all;
         width: 100%;
 
         a {
-          font-size: 16px;
+          font-size: 1.3rem;
           font-weight: 600;
           color: var(--text-color);
+          line-height: 1.4;
 
           &:hover {
-            //color: #3273dc;
-            text-decoration: underline;
+            color: var(--text-link-color);
+            text-decoration: none;
           }
         }
       }
 
       .topic-summary {
         font-size: 14px;
-        margin-bottom: 6px;
+        margin-bottom: 1rem;
         width: 100%;
         text-decoration: none;
-        color: var(--text-color3);
+        color: #555;
         word-wrap: break-word;
+        line-height: 1.6;
 
         overflow: hidden;
         display: -webkit-box;
@@ -254,7 +269,9 @@ const toTopicDetail = (topicId) => {
       }
 
       .topic-image-list {
-        margin-top: 10px;
+        margin-top: 1rem;
+        display: grid;
+        gap: 8px;
 
         li {
           cursor: pointer;
@@ -262,13 +279,14 @@ const toTopicDetail = (topicId) => {
 
           display: inline-block;
           vertical-align: middle;
-          margin: 0 8px 8px 0;
+          margin: 0;
           background-color: var(--bg-color2);
           background-size: 32px 32px;
           background-position: 50%;
           background-repeat: no-repeat;
           overflow: hidden;
           position: relative;
+          border-radius: 8px;
 
           .image-item {
             display: block;
@@ -293,6 +311,7 @@ const toTopicDetail = (topicId) => {
             width: 210px;
             height: 210px;
             line-height: 210px;
+            grid-column: span 3;
 
             .image-item {
               width: 210px;
@@ -326,6 +345,14 @@ const toTopicDetail = (topicId) => {
             }
           }
         }
+
+        /* Grid layout for multiple images */
+        &:has(li:nth-child(3)) {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        &:has(li:nth-child(2)):not(:has(li:nth-child(3))) {
+          grid-template-columns: repeat(2, 1fr);
+        }
       }
     }
 
@@ -333,6 +360,8 @@ const toTopicDetail = (topicId) => {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 1rem 1.2rem;
+      border-top: 1px solid var(--border-color);
 
       .topic-tags {
         display: flex;
@@ -341,15 +370,17 @@ const toTopicDetail = (topicId) => {
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 4px 10px;
-          border-radius: 18px;
+          padding: 6px 12px;
+          border-radius: 50px;
           background: var(--bg-color6);
           color: var(--text-color3);
           font-size: 13px;
+          transition: all 0.2s ease;
 
           &:hover {
             color: var(--text-color3-hover);
             background: var(--bg-color6-hover);
+            transform: translateY(-2px);
           }
 
           img {
@@ -366,37 +397,39 @@ const toTopicDetail = (topicId) => {
       .topic-actions {
         display: flex;
         align-items: center;
-        margin-top: 6px;
+        margin-top: 0;
         font-size: 12px;
         user-select: none;
+        gap: 1rem;
 
         .btn {
           color: var(--text-color3);
           cursor: pointer;
           display: flex;
           align-items: center;
-
-          &:not(:last-child) {
-            margin-right: 20px;
-          }
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 8px;
+          transition: all 0.2s ease;
 
           &:hover {
             color: var(--text-link-color);
+            background-color: rgba(74, 108, 247, 0.1);
           }
 
           i {
-            margin-right: 3px;
             font-size: 16px;
             position: relative;
           }
 
           span {
-            line-height: 24px;
+            line-height: 1;
             font-size: 15px;
           }
 
           &.liked {
             color: var(--color-red) !important;
+            background-color: rgba(255, 68, 68, 0.1);
           }
         }
       }
@@ -407,11 +440,24 @@ const toTopicDetail = (topicId) => {
 @media screen and (max-width: 768px) {
   .topic-list {
     .topic-item {
-      padding: 12px 12px;
+      padding: 0;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+
+      .topic-header {
+        padding: 1rem;
+      }
+
+      .topic-content {
+        padding: 1rem;
+      }
+
+      .topic-bottom {
+        padding: 0.75rem 1rem;
+      }
 
       &:after {
-        left: 12px !important;
-        right: 12px !important;
+        display: none !important;
       }
     }
   }
