@@ -17,8 +17,8 @@
 
 <script setup>
 const { data } = await useMyFetch("/api/user/msg_recent");
-const msgcount = ref(data.value.count || 0);
-// const messages = ref(data.value.messages || []);
+const msgcount = ref(data.value?.count || 0);
+// const messages = ref(data.value?.messages || []);
 </script>
 
 <style lang="scss" scoped>

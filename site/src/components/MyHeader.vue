@@ -31,7 +31,7 @@
           <div class="navbar-item has-dropdown is-hoverable">
             <div class="navbar-link">
               <i class="iconfont icon-category"></i>
-              <span >{{ $t('common.topicCategories') }}</span>
+              <span>{{ $t('common.topicCategories') }}</span>
             </div>
             <div class="navbar-dropdown">
               <nuxt-link
@@ -86,7 +86,7 @@
             v-if="user"
             class="navbar-item has-dropdown is-hoverable user-menus"
           >
-            <div class="navbar-link">
+            <div class="navbar-link user-info">
               <MyAvatar :user="user" :size="24" />
               <span
                 :to="`/user/${user.id}`"
@@ -194,42 +194,69 @@ function getNodeIconClass(nodeId) {
 .navbar {
   /*opacity: 0.99;*/
   /*border-bottom: 1px solid #e7edf3;*/
-  background-color: var(--bg-color);
+  background: linear-gradient(135deg, #4a6cf7, #6a11cb);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
 
   .navbar-item {
-    font-weight: 700;
+    font-weight: 500;
+    color: white;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    margin: 0 0.25rem;
+  }
+
+  .navbar-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
   }
 
   .publish {
-    color: var(--text-color);
+    color: white;
     background-color: #3174dc;
     width: 100px;
+    border-radius: 50px;
     &:hover {
-      color: var(--text-color);
+      color: white;
       background-color: #4d91fa;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
   }
 
   .login-btn {
     height: 32px;
-    border-color: #000; // TODO
+    border: 2px solid white;
+    color: white;
+    background-color: transparent;
+    border-radius: 50px;
     &:hover {
-      color: var(--text-color3);
-      border-color: var(--text-color3);
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
   }
 }
 
 .user-menus {
-  .navbar-link {
+  .navbar-link.user-info {
     display: flex;
     align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
 
     .user-menus-nickname {
       margin-left: 5px;
       padding: 0 4px;
       font-size: 14px;
-      color: var(--text-color);
+      color: white;
+      font-weight: 500;
 
       white-space: nowrap;
       overflow: hidden;
@@ -238,22 +265,32 @@ function getNodeIconClass(nodeId) {
   }
   .navbar-dropdown {
     border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
 
     a {
       display: flex;
       align-items: center;
-      // padding: 8px 16px;
+      padding: 0.75rem 1rem;
+      transition: all 0.2s ease;
+      border-radius: 8px;
+      margin: 0.25rem;
+      
+      &:hover {
+        background-color: rgba(74, 108, 247, 0.1);
+      }
+      
       img {
         width: 20px;
         height: 20px;
       }
       span {
         margin-left: 10px;
-        width: 56px;
-        height: 20px;
         font-size: 14px;
-        font-weight: 400;
+        font-weight: 500;
         line-height: 20px;
+        color: var(--text-color);
       }
     }
   }
@@ -261,15 +298,19 @@ function getNodeIconClass(nodeId) {
 
 /* Topics Nav Dropdown Styles */
 .navbar-dropdown {
-  width: 220px;
-  max-height: 300px;
+  width: 240px;
+  max-height: 320px;
   overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem;
+  background-color: white;
 }
 
 .node-logo-dropdown {
   width: 16px;
   height: 16px;
-  border-radius: 3px;
+  border-radius: 4px;
   margin-right: 8px;
   flex-shrink: 0;
 }
@@ -297,9 +338,9 @@ function getNodeIconClass(nodeId) {
 /* 悬停状态的样式增强 */
 .navbar-dropdown .navbar-item:hover,
 .navbar-item.hovered {
-  background-color: rgba(74, 108, 247, 0.08);
+  background-color: rgba(74, 108, 247, 0.1);
   padding-left: 12px;
-  border-radius: 4px;
+  border-radius: 8px;
 }
 
 .node-name-dropdown {
@@ -309,16 +350,19 @@ function getNodeIconClass(nodeId) {
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+  color: var(--text-color);
 }
 
 .navbar-dropdown a.active {
-  background-color: var(--primary-50);
-  color: var(--primary-6);
+  background-color: rgba(74, 108, 247, 0.15);
+  color: #4a6cf7;
   font-weight: 500;
 }
 
 .navbar-dropdown a:hover {
-  background-color: var(--bg-color-light);
+  background-color: rgba(74, 108, 247, 0.08);
+  transform: translateX(2px);
+  transition: all 0.2s ease;
 }
 
 /* Custom scrollbar for dropdown */
@@ -327,15 +371,43 @@ function getNodeIconClass(nodeId) {
 }
 
 .navbar-dropdown::-webkit-scrollbar-track {
-  background: var(--bg-color-light);
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
 }
 
 .navbar-dropdown::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: rgba(0, 0, 0, 0.2);
   border-radius: 3px;
 }
 
 .navbar-dropdown::-webkit-scrollbar-thumb:hover {
-  background: var(--text-color-light);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* 响应式优化 */
+@media screen and (max-width: 1024px) {
+  .navbar-dropdown {
+    width: 200px;
+    max-height: 250px;
+  }
+  
+  .node-name-dropdown {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .navbar {
+    padding: 0.25rem 0;
+  }
+  
+  .navbar-dropdown {
+    width: 180px;
+    max-height: 200px;
+  }
+  
+  .user-menus .navbar-link.user-info {
+    padding: 0.25rem 0.75rem;
+  }
 }
 </style>
