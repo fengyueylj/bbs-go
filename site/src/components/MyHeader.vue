@@ -29,7 +29,7 @@
         <div class="navbar-start">
           <!-- Topics Nav Dropdown -->
           <div class="navbar-item has-dropdown is-hoverable">
-            <div class="navbar-link">
+            <div class="navbar-link topic-categories">
               <i class="iconfont icon-category"></i>
               <span>{{ $t('common.topicCategories') }}</span>
             </div>
@@ -89,26 +89,33 @@
             <div class="navbar-link user-info">
               <MyAvatar :user="user" :size="24" />
               <span
-                :to="`/user/${user.id}`"
                 class="user-menus-nickname ellipsis"
                 >{{ user.nickname }}</span
               >
             </div>
             <div class="navbar-dropdown">
-              <nuxt-link class="navbar-item" :to="`/user/${user.id}`">
-                <i class="iconfont icon-username" />
+              <nuxt-link class="navbar-item dropdown-item" :to="`/user/${user.id}`">
+                <div style="width: 20px; height: 20px; margin-right: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                  <i class="iconfont icon-username" />
+                </div>
                 <span>{{ $t("common.header.profile") }}</span>
               </nuxt-link>
-              <nuxt-link class="navbar-item" to="/user/favorites">
-                <i class="iconfont icon-favorite" />
+              <nuxt-link class="navbar-item dropdown-item" to="/user/favorites">
+                <div style="width: 20px; height: 20px; margin-right: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                  <i class="iconfont icon-favorite" />
+                </div>
                 <span>{{ $t("common.header.favorites") }}</span>
               </nuxt-link>
-              <nuxt-link class="navbar-item" to="/user/profile">
-                <i class="iconfont icon-edit" />
+              <nuxt-link class="navbar-item dropdown-item" to="/user/profile">
+                <div style="width: 20px; height: 20px; margin-right: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                  <i class="iconfont icon-edit" />
+                </div>
                 <span>{{ $t("common.header.editProfile") }}</span>
               </nuxt-link>
-              <a class="navbar-item" @click="signout">
-                <i class="iconfont icon-log-out" />
+              <a class="navbar-item dropdown-item" @click="signout">
+                <div style="width: 20px; height: 20px; margin-right: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                  <i class="iconfont icon-log-out" />
+                </div>
                 <span>{{ $t("common.header.logout") }}</span>
               </a>
             </div>
@@ -210,6 +217,23 @@ function getNodeIconClass(nodeId) {
   .navbar-item:hover {
     background-color: rgba(255, 255, 255, 0.2);
   }
+  
+  /* Topic Categories Dropdown Toggle */
+  .navbar-link.topic-categories {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    padding-right: 2rem; /* Add space for dropdown arrow */
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+  
+  .has-dropdown:hover .navbar-link.topic-categories {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
 
   .publish {
     color: white;
@@ -244,8 +268,10 @@ function getNodeIconClass(nodeId) {
     align-items: center;
     gap: 8px;
     padding: 0.5rem 1rem;
+    padding-right: 2rem; /* Add space for dropdown arrow */
     border-radius: 50px;
     transition: all 0.3s ease;
+    position: relative;
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.2);
@@ -257,6 +283,7 @@ function getNodeIconClass(nodeId) {
       font-size: 14px;
       color: white;
       font-weight: 500;
+      max-width: 100px;
 
       white-space: nowrap;
       overflow: hidden;
@@ -266,31 +293,35 @@ function getNodeIconClass(nodeId) {
   .navbar-dropdown {
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     margin-top: 5px;
+    padding: 0.5rem;
+    background-color: white;
 
-    a {
+    a.dropdown-item {
       display: flex;
       align-items: center;
-      padding: 0.75rem 1rem;
+      padding: 0.5rem 0.75rem;
       transition: all 0.2s ease;
       border-radius: 8px;
-      margin: 0.25rem;
+      margin: 0.25rem 0;
+      color: var(--text-color);
       
       &:hover {
         background-color: rgba(74, 108, 247, 0.1);
+        transform: translateX(2px);
       }
       
-      img {
-        width: 20px;
-        height: 20px;
+      i {
+        font-size: 16px;
       }
+      
       span {
-        margin-left: 10px;
         font-size: 14px;
         font-weight: 500;
         line-height: 20px;
         color: var(--text-color);
+        flex: 1;
       }
     }
   }

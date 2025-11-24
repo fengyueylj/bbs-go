@@ -25,27 +25,39 @@ const msgcount = ref(data.value?.count || 0);
 .msg-notice {
   .msgicon {
     font-size: 15px;
-    color: var(--text-color);
+    color: white;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
 
     display: flex;
     align-items: center;
     column-gap: 6px;
 
     &:hover {
-      color: red;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    
+    sup {
+      background-color: #ff4444;
+      color: white;
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
     }
   }
 
   // 闪烁
   .msg-flicker {
-    // animation: msgnotice 1s 3;
     animation: msgnotice 1s infinite;
   }
 
   @keyframes msgnotice {
     50% {
-      // color: transparent;
-      color: red;
+      background-color: rgba(255, 68, 68, 0.2);
     }
   }
 }
