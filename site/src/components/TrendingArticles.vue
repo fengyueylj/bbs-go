@@ -1,21 +1,21 @@
 <template>
   <div class="trending-card">
     <h3 class="trending-header">
-      <i class="iconfont icon-fire"></i>
-      <span>热门帖子</span>
+      <i class="iconfont icon-article"></i>
+      <span>热门文章</span>
     </h3>
     <div class="trending-list">
       <nuxt-link
-        v-for="(item, index) in trendingTopics"
+        v-for="(item, index) in trendingArticles"
         :key="item.id"
-        :to="`/topic/${item.id}`"
+        :to="`/article/${item.id}`"
         class="trending-item"
       >
         <div class="trending-rank" :class="getRankClass(index)">{{ index + 1 }}</div>
         <div class="trending-content">
           <div class="trending-title">{{ item.title }}</div>
           <div class="trending-meta">
-            <span><i class="iconfont icon-like"></i> {{ item.likeCount || 0 }}</span>
+            <span><i class="iconfont icon-view"></i> {{ item.viewCount || 0 }}</span>
             <span><i class="iconfont icon-comment"></i> {{ item.commentCount || 0 }}</span>
           </div>
         </div>
@@ -25,19 +25,18 @@
 </template>
 
 <script setup>
-const trendingTopics = ref([]);
+const trendingArticles = ref([]);
 
-// 获取热门帖子
-const { data } = await useMyFetch('/api/topic/topics', {
+// 获取热门文章
+const { data } = await useMyFetch('/api/article/articles', {
   params: {
     page: 1,
     limit: 10,
-    sortBy: 'likeCount', // 按点赞数排序
   }
 });
 
 if (data.value?.results) {
-  trendingTopics.value = data.value.results.slice(0, 10);
+  trendingArticles.value = data.value.results.slice(0, 10);
 }
 
 const getRankClass = (index) => {
@@ -73,9 +72,8 @@ const getRankClass = (index) => {
   font-weight: 600;
 
   i {
-    color: #ff6b6b;
+    color: #4a6cf7;
     font-size: 1.2rem;
-    animation: fire 1.5s ease-in-out infinite;
   }
 }
 
@@ -166,15 +164,6 @@ const getRankClass = (index) => {
     i {
       font-size: 0.75rem;
     }
-  }
-}
-
-@keyframes fire {
-  0%, 100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
   }
 }
 
