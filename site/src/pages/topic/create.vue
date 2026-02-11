@@ -65,6 +65,9 @@
           </div>
         </div>
 
+        <!-- 地理位置选择 -->
+        <MapSelector v-model="postForm.location" @confirm="handleLocationConfirm" />
+
         <div v-if="postForm.type === 0" class="field">
           <div class="control">
             <markdown-editor
@@ -104,16 +107,11 @@
         </div>
 
         <div class="form-footer">
-          <a
-            :class="{ 'is-loading': publishing }"
+          <a :class="{ 'is-loading': publishing }"
             class="button is-primary btn-publish"
-            @click="publish"
-            >{{
-              postForm.type === 1
-                ? $t("pages.topic.create.tweetBtn")
-                : $t("pages.topic.create.postBtn")
-            }}</a
-          >
+            @click="publish">
+            {{postForm.type === 1 ? $t("pages.topic.create.tweetBtn") : $t("pages.topic.create.postBtn")}}
+          </a>
         </div>
       </div>
     </div>
@@ -124,6 +122,7 @@
 
 <script setup>
 import { useI18n } from "vue-i18n";
+import MapSelector from "~/components/MapSelector.vue";
 
 definePageMeta({
   middleware: "auth",
@@ -154,6 +153,18 @@ const postForm = ref({
   content: "",
   hideContent: "",
   imageList: [],
+  
+  // 地理位置信息
+  location: {
+    province: "",
+    city: "",
+    district: "",
+    detail: "",
+    location: {
+      lat: 0,
+      lng: 0
+    }
+  },
 
   captchaId: "",
   captchaCode: "",
@@ -197,7 +208,7 @@ const init = () => {
   if (!contentType) {
     contentType = "html";
   }
-  postForm.value.contentType = "contentType";
+  postForm.value.contentType = contentType;
 
   useHead({
     title: useSiteTitle(
@@ -221,7 +232,7 @@ const switchEditor = () => {
         postForm.value.contentType = "markdown";
       }
     })
-    .catch(() => {});
+    .catch(() => {}); // 空的错误处理函数
 };
 
 const publish = () => {
@@ -237,6 +248,12 @@ const publish = () => {
     publishSubmit();
   }
 };
+
+// 处理地理位置确认
+function handleLocationConfirm(location) {
+  postForm.value.location = location;
+  console.log('地理位置已确认:', location);
+}
 
 const publishSubmit = async (captcha) => {
   if (publishing.value) {

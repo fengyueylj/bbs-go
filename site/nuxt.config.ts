@@ -66,6 +66,11 @@ export default defineNuxtConfig({
           src: 'https://hm.baidu.com/hm.js?79b8ff82974d0769ef5c629e4cd46629',
           type: 'text/javascript',
           async: true
+        },
+        {
+          src: 'https://webapi.amap.com/maps?v=2.0&key=YOUR_AMAP_KEY&plugin=AMap.Autocomplete,AMap.PlaceSearch,AMap.Geocoder',
+          type: 'text/javascript',
+          async: true
         }
       ]
     },

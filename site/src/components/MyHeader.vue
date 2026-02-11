@@ -30,7 +30,7 @@
           <!-- Topics Nav Dropdown -->
           <div class="navbar-item has-dropdown is-hoverable">
             <div class="navbar-link topic-categories">
-              <i class="iconfont icon-category"></i>
+              <!-- i class="iconfont icon-category"></i-->
               <span>{{ $t('common.topicCategories') }}</span>
             </div>
             <div class="navbar-dropdown">
@@ -216,6 +216,12 @@ function getNodeIconClass(nodeId) {
 
   .navbar-item:hover {
     background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* 调整箭头位置 */
+  .navbar-link::after {
+    right: 1em;  /* 调整水平位置 */
+    top: 47%;      /* 调整垂直位置 */
   }
   
   /* Topic Categories Dropdown Toggle */
