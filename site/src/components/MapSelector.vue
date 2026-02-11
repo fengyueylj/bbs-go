@@ -1,10 +1,5 @@
 <template>
   <div class="map-selector">
-    <!-- 地图标题 -->
-    <div class="map-title">
-      地理位置选择
-    </div>
-    
     <!-- 地址搜索框 -->
     <div class="search-section">
       <el-input

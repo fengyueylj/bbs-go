@@ -19,26 +19,11 @@
       <div v-else class="publish-form">
         <div class="form-title">
           <div class="form-title-name">
-            {{
+            {{ 
               postForm.type === 0
                 ? $t("pages.topic.create.post")
                 : $t("pages.topic.create.tweet")
             }}
-          </div>
-          <div
-            v-if="postForm.type === 0"
-            class="form-title-switch"
-            @click="switchEditor"
-          >
-            <div v-if="postForm.contentType === 'markdown'" class="editor-type">
-              <img src="~/assets/images/markdown.svg" />
-              <span>Markdown</span>
-            </div>
-            <div v-else class="editor-type">
-              <img src="~/assets/images/html.svg" />
-              <span>HTML</span>
-            </div>
-            <i class="iconfont icon-switch" />
           </div>
         </div>
 
@@ -54,8 +39,8 @@
           </div>
         </div>
 
-        <div v-if="postForm.type === 0" class="field">
-          <div class="control">
+        <div v-if="postForm.type === 0" class="editor-container">
+          <div class="editor-content">
             <input
               v-model="postForm.title"
               class="input topic-title"
@@ -68,8 +53,19 @@
         <!-- 地理位置选择 -->
         <MapSelector v-model="postForm.location" @confirm="handleLocationConfirm" />
 
-        <div v-if="postForm.type === 0" class="field">
-          <div class="control">
+        <div v-if="postForm.type === 0" class="editor-container">
+          <div class="editor-title">
+            <span>{{ postForm.contentType === 'markdown' ? 'Markdown 编辑器' : 'HTML 编辑器' }}</span>
+            <div class="editor-switch" @click="switchEditor">
+              <div class="editor-type">
+                <img v-if="postForm.contentType === 'markdown'" src="~/assets/images/markdown.svg" />
+                <img v-else src="~/assets/images/html.svg" />
+                <span>{{ postForm.contentType === 'markdown' ? 'Markdown' : 'HTML' }}</span>
+              </div>
+              <i class="iconfont icon-switch" />
+            </div>
+          </div>
+          <div class="editor-content">
             <markdown-editor
               v-if="postForm.contentType === 'markdown'"
               v-model="postForm.content"
@@ -83,14 +79,14 @@
           </div>
         </div>
 
-        <div v-if="postForm.type === 0 && isEnableHideContent" class="field">
-          <div class="control">
+        <div v-if="postForm.type === 0 && isEnableHideContent" class="editor-container">
+          <div class="editor-content">
             <MEditor v-model="postForm.hideContent" height="200px" />
           </div>
         </div>
 
-        <div v-if="postForm.type === 1" class="field">
-          <div class="control">
+        <div v-if="postForm.type === 1" class="editor-container">
+          <div class="editor-content">
             <simple-editor
               ref="simpleEditorComponent"
               :placeholder="$t('pages.topic.create.contentPlaceholder')"
@@ -100,8 +96,8 @@
           </div>
         </div>
 
-        <div class="field">
-          <div class="control">
+        <div class="editor-container">
+          <div class="editor-content">
             <tag-input v-model="postForm.tags" />
           </div>
         </div>
@@ -283,3 +279,131 @@ const publishSubmit = async (captcha) => {
   }
 };
 </script>
+
+<style scoped>
+/* 编辑器容器样式 */
+.editor-container {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: all 0.3s ease;
+}
+
+.editor-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* 编辑器标题样式 */
+.editor-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e4e7ed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 编辑器切换按钮样式 */
+.editor-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+}
+
+.editor-switch:hover {
+  background: #ecf5ff;
+  border-color: #d9ecff;
+  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.15);
+}
+
+.editor-switch .editor-type {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-switch .editor-type img {
+  width: 16px;
+  height: 16px;
+}
+
+.editor-switch .editor-type span {
+  color: #606266;
+  font-weight: 500;
+}
+
+.editor-switch .icon-switch {
+  font-size: 14px;
+  color: #909399;
+  transition: transform 0.3s ease;
+}
+
+.editor-switch:hover .icon-switch {
+  color: #409eff;
+  transform: rotate(180deg);
+}
+
+/* 编辑器内容样式 */
+.editor-content {
+  width: 100%;
+}
+
+/* 标题输入框样式 */
+.topic-title {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #303133;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.topic-title:focus {
+  outline: none;
+  border-color: #409eff;
+  box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+}
+
+.topic-title::placeholder {
+  color: #909399;
+  font-weight: 400;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .editor-container {
+    padding: 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  
+  .editor-container:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  
+  .editor-title {
+    font-size: 15px;
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+  }
+}
+</style>
