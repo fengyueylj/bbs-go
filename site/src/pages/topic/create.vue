@@ -50,8 +50,10 @@
           </div>
         </div>
 
-        <!-- 地理位置选择 -->
-        <MapSelector v-model="postForm.location" @confirm="handleLocationConfirm" />
+        <div v-if="postForm.type === 0">
+          <!-- 地理位置选择 -->
+          <MapSelector v-model="postForm.location" @confirm="handleLocationConfirm" />
+        </div>
 
         <div v-if="postForm.type === 0" class="editor-container">
           <div class="editor-title">
@@ -286,15 +288,9 @@ const publishSubmit = async (captcha) => {
   width: 100%;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   padding: 24px;
   margin-bottom: 24px;
-  transition: all 0.3s ease;
-}
-
-.editor-container:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
 }
 
 /* 编辑器标题样式 */
@@ -393,10 +389,6 @@ const publishSubmit = async (captcha) => {
     padding: 20px;
     border-radius: 6px;
     margin-bottom: 20px;
-  }
-  
-  .editor-container:hover {
-    transform: none;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
   

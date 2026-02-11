@@ -392,7 +392,7 @@ function resetSelection() {
   width: 100%;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   padding: 24px;
   margin-bottom: 24px;
 }
@@ -716,6 +716,7 @@ function resetSelection() {
   .map-selector {
     padding: 20px;
     border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
   
   .map-title {
