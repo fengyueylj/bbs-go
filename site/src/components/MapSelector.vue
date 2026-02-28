@@ -1,12 +1,17 @@
 <template>
   <div class="map-selector">
+    <!-- 地图标题 -->
+    <div class="map-title">
+      地理位置选择
+    </div>
+    
     <!-- 地址搜索框 -->
     <div class="search-section">
       <el-input
         v-model="searchKeyword"
         placeholder="请输入地址、小区名称等"
         clearable
-        @input="handleSearch"
+        @keyup.enter="handleSearch"
         @clear="clearSearch"
         :loading="searchLoading"
       >
@@ -29,6 +34,7 @@
           <div class="result-info">
             <div class="result-name">{{ result.name }}</div>
             <div class="result-address">{{ result.address }}</div>
+            <div class="result-type" v-if="result.type">{{ result.type }}</div>
           </div>
         </div>
       </div>
@@ -67,6 +73,9 @@
     
     <!-- 地图容器 -->
     <div class="map-container-wrapper">
+      <!-- 地图容器元素（始终存在） -->
+      <div ref="mapContainer" class="map-container"></div>
+      
       <!-- 地图加载中 -->
       <div v-if="mapLoading" class="map-loading">
         <el-icon class="is-loading"><Loading /></el-icon>
@@ -76,17 +85,20 @@
       <!-- 地图加载失败 -->
       <div v-else-if="mapError" class="map-error">
         <el-icon><Warning /></el-icon>
-        <span>地图加载失败，请检查网络连接</span>
+        <span>地图加载失败，请检查网络连接或API密钥是否正确</span>
         <el-button type="primary" size="small" @click="initMap">重新加载</el-button>
       </div>
       
-      <!-- 地图容器 -->
-      <div v-else ref="mapContainer" class="map-container"></div>
+      <!-- 地图未初始化 -->
+      <div v-else-if="!map" class="map-not-initialized">
+        <el-icon><InfoFilled /></el-icon>
+        <span>地图初始化中，请稍候...</span>
+      </div>
     </div>
     
     <!-- 地图控制按钮 -->
     <div class="map-controls">
-      <el-button type="primary" @click="confirmSelection">
+      <el-button type="primary" @click="confirmSelection" :disabled="!isValidAddress">
         确认选择
       </el-button>
       <el-button @click="resetSelection">
@@ -108,6 +120,7 @@
             <li>2. 点击搜索结果或在地图上直接点击选择位置</li>
             <li>3. 系统会自动填充省市县区等地址信息</li>
             <li>4. 确认无误后点击"确认选择"按钮</li>
+            <li>5. 您可以拖动地图上的标记来调整位置</li>
           </ul>
         </template>
       </el-alert>
@@ -116,8 +129,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
-import { Loading, Warning } from '@element-plus/icons-vue';
+import { ref, onMounted, watch, computed } from 'vue';
+import { Loading, Warning, InfoFilled } from '@element-plus/icons-vue';
+import AMapLoader from '@amap/amap-jsapi-loader';
+
+window._AMapSecurityConfig = {
+  securityJsCode: "44f988b928cc85c88e45b278e47a8312",
+};
+
+// 搜索防抖定时器
+let searchTimer = null;
 
 const props = defineProps({
   modelValue: {
@@ -162,6 +183,12 @@ const searchResults = ref([]);
 const placeSearch = ref(null);
 const geocoder = ref(null);
 
+// 计算属性
+const isValidAddress = computed(() => {
+  return address.value.location.lat !== 0 && address.value.location.lng !== 0 && 
+         (address.value.province || address.value.city || address.value.district || address.value.detail);
+});
+
 // 监听modelValue变化
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
@@ -179,47 +206,82 @@ watch(() => props.modelValue, (newValue) => {
 function initMap() {
   mapLoading.value = true;
   mapError.value = false;
-  
+
+  // 检查高德地图API是否加载
   if (typeof AMap === 'undefined') {
-    console.error('高德地图API加载失败，请检查API密钥是否正确');
+    console.error('高德地图API加载失败，请检查：');
     mapLoading.value = false;
     mapError.value = true;
     return;
   }
-  
+
   try {
-    // 初始化地图实例
-    map.value = new AMap.Map(mapContainer.value, {
-      zoom: 13,
-      center: [116.397428, 39.90923], // 默认北京
-      resizeEnable: true
-    });
-    
-    // 初始化搜索服务
-    placeSearch.value = new AMap.PlaceSearch({
-      pageSize: 10,
-      pageIndex: 1,
-      city: '', // 全国
-      map: map.value,
-      panel: null
-    });
-    
-    // 初始化地理编码服务
-    geocoder.value = new AMap.Geocoder({
-      city: '', // 全国
-      radius: 1000
-    });
-    
-    // 添加地图点击事件
-    map.value.on('click', handleMapClick);
-    
-    // 如果有初始位置，显示标记
-    if (address.value.location.lat && address.value.location.lng) {
-      setMarker([address.value.location.lng, address.value.location.lat]);
-      map.value.setCenter([address.value.location.lng, address.value.location.lat]);
+    // 检查mapContainer是否存在
+    if (!mapContainer.value) {
+      console.error('地图容器不存在');
+      mapLoading.value = false;
+      mapError.value = true;
+      return;
     }
-    
-    mapLoading.value = false;
+
+    // 使用AMap.plugin加载所需插件
+    AMap.plugin(['AMap.ToolBar', 'AMap.AutoComplete', 'AMap.Scale', 'AMap.PlaceSearch', 'AMap.Geocoder'], function() {
+      try {
+        // 初始化地图实例
+        map.value = new AMap.Map(mapContainer.value, {
+          zoom: 13,
+          center: [116.397428, 39.90923], // 默认北京
+          resizeEnable: true,
+          zoomEnable: true,
+          dragEnable: true,
+          doubleClickZoom: true,
+          keyboardEnable: true
+        });
+
+        // 添加地图控件
+        try {
+          const toolbar = new AMap.ToolBar();
+          map.value.addControl(toolbar);
+
+          const scale = new AMap.Scale();
+          map.value.addControl(scale);
+        } catch (controlError) {
+          console.warn('添加地图控件失败:', controlError);
+        }
+
+        // 初始化搜索服务
+        placeSearch.value = new AMap.PlaceSearch({
+          pageSize: 10,
+          pageIndex: 1,
+          city: '全国',
+          map: map.value,
+          panel: "my-panel",
+          autoFitView: true
+        });
+
+        // 初始化地理编码服务
+        geocoder.value = new AMap.Geocoder({
+          city: '全国',
+          radius: 1000
+        });
+
+        // 添加地图点击事件
+        map.value.on('click', handleMapClick);
+
+        // 如果有初始位置，显示标记
+        if (address.value.location.lat && address.value.location.lng) {
+          setMarker([address.value.location.lng, address.value.location.lat]);
+          map.value.setCenter([address.value.location.lng, address.value.location.lat]);
+          map.value.setZoom(15);
+        }
+
+        mapLoading.value = false;
+      } catch (error) {
+        console.error('地图初始化失败:', error);
+        mapLoading.value = false;
+        mapError.value = true;
+      }
+    });
   } catch (error) {
     console.error('地图初始化失败:', error);
     mapLoading.value = false;
@@ -301,33 +363,60 @@ function setMarker(lnglat) {
 
 // 地址搜索
 function handleSearch() {
-  if (!searchKeyword.value) return;
-  
+  if (!searchKeyword.value || searchKeyword.value.trim() === '') return;
+
+  // 清除之前的定时器
+  if (searchTimer) {
+    clearTimeout(searchTimer);
+  }
+
   searchLoading.value = true;
   searchResults.value = [];
-  
-  try {
-    placeSearch.value.search(searchKeyword.value, function(status, result) {
-      searchLoading.value = false;
-      
-      if (status === 'complete' && result.pois) {
-        searchResults.value = result.pois.map(item => ({
-          name: item.name,
-          address: item.address,
-          location: {
-            lat: item.location.lat,
-            lng: item.location.lng
-          }
-        }));
-      } else {
-        searchResults.value = [];
-      }
-    });
-  } catch (error) {
-    console.error('搜索失败:', error);
+
+  // 检查placeSearch是否初始化
+  if (!placeSearch.value) {
+    console.error('搜索服务未初始化，请等待地图加载完成');
     searchLoading.value = false;
-    searchResults.value = [];
+    return;
   }
+
+  // 使用防抖延迟搜索
+  searchTimer = setTimeout(() => {
+    try {
+      const keyword = searchKeyword.value.trim();
+
+      placeSearch.value.search(keyword, function(status, result) {
+        searchLoading.value = false;
+
+        if (status === 'complete' && result.info === 'OK' && result.poiList && result.poiList.pois) {
+          const pois = result.poiList.pois;
+          searchResults.value = pois.map(item => ({
+            name: item.name,
+            address: item.address || '',
+            location: {
+              lat: item.location ? item.location.lat : 0,
+              lng: item.location ? item.location.lng : 0
+            },
+            type: item.type || '',
+            tel: item.tel || '',
+            distance: item.distance || ''
+          }));
+        } else if (status === 'complete' && result.info === 'NO_DATA') {
+          // 没有搜索到结果
+          searchResults.value = [];
+        } else if (status === 'error') {
+          console.error('搜索失败:', result);
+          searchResults.value = [];
+        } else {
+          searchResults.value = [];
+        }
+      });
+    } catch (error) {
+      console.error('搜索失败:', error);
+      searchLoading.value = false;
+      searchResults.value = [];
+    }
+  }, 300); // 300ms 防抖延迟
 }
 
 // 清除搜索
@@ -508,6 +597,62 @@ function resetSelection() {
   text-align: center;
   color: #909399;
   margin-top: 8px;
+}
+
+/* 搜索提示 */
+.search-tip {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #f8f9fa;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  z-index: 1000;
+  padding: 16px;
+  text-align: center;
+  color: #909399;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* 搜索结果类型 */
+.result-type {
+  font-size: 11px;
+  color: #409eff;
+  background: #ecf5ff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+  margin-top: 4px;
+}
+
+/* 地图未初始化 */
+.map-not-initialized {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.map-not-initialized .el-icon {
+  font-size: 32px;
+  color: #409eff;
+}
+
+.map-not-initialized span {
+  color: #606266;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 /* 地址输入框区域 */

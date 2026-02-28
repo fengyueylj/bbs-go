@@ -28,6 +28,7 @@
     "typescript": "5.8.2"
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
     "@asika32764/vue-animate": "^3.0.2",
     "@pinia/nuxt": "0.10.1",
     "go-captcha-vue": "^2",
