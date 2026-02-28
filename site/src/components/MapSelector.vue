@@ -40,7 +40,7 @@
       </div>
       
       <!-- 搜索无结果 -->
-      <div v-else-if="searchKeyword && !searchLoading" class="search-no-result">
+      <div v-else-if="searchKeyword && !searchLoading && !resultSelected" class="search-no-result">
         未找到相关地址，请尝试其他关键词
       </div>
     </div>
@@ -165,6 +165,7 @@ const marker = ref(null);
 const mapLoading = ref(true);
 const mapError = ref(false);
 const searchLoading = ref(false);
+const resultSelected = ref(false);
 
 // 地址数据
 const address = ref({
@@ -369,6 +370,7 @@ function handleSearch() {
 
   searchLoading.value = true;
   searchResults.value = [];
+  resultSelected.value = false;
 
   // 检查placeSearch是否初始化
   if (!placeSearch.value) {
@@ -419,6 +421,7 @@ function handleSearch() {
 // 清除搜索
 function clearSearch() {
   searchResults.value = [];
+  resultSelected.value = false;
 }
 
 // 选择搜索结果
@@ -444,6 +447,7 @@ function selectSearchResult(result) {
   
   searchResults.value = [];
   searchKeyword.value = result.name;
+  resultSelected.value = true;
 }
 
 // 确认选择
