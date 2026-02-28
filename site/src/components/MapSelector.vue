@@ -45,27 +45,32 @@
       </div>
     </div>
     
-    <!-- 地址输入框 -->
+    <!-- 地址输入框（只读，通过点击地图填充） -->
     <div class="address-inputs">
       <el-row :gutter="20">
-        <el-col :span="6">
+        <el-col :span="3">
           <el-form-item label="省">
-            <el-input v-model="address.province" placeholder="请输入省份" />
+            <el-input v-model="address.province" placeholder="点击地图自动填充" disabled />
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="3">
           <el-form-item label="市">
-            <el-input v-model="address.city" placeholder="请输入城市" />
+            <el-input v-model="address.city" placeholder="点击地图自动填充" disabled />
           </el-form-item>
         </el-col>
-        <el-col :span="6">
+        <el-col :span="3">
           <el-form-item label="区/县">
-            <el-input v-model="address.district" placeholder="请输入区县" />
+            <el-input v-model="address.district" placeholder="点击地图自动填充" disabled />
+          </el-form-item>
+        </el-col>
+        <el-col :span="9">
+          <el-form-item label="详细地址">
+            <el-input v-model="address.detail" placeholder="点击地图自动填充" />
           </el-form-item>
         </el-col>
         <el-col :span="6">
-          <el-form-item label="详细地址">
-            <el-input v-model="address.detail" placeholder="请输入详细地址" />
+          <el-form-item label="具体房号">
+            <el-input v-model="address.roomNumber" placeholder="请输入具体房号" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -146,6 +151,7 @@ const props = defineProps({
       city: '',
       district: '',
       detail: '',
+      roomNumber: '',
       location: {
         lat: 0,
         lng: 0
@@ -173,6 +179,7 @@ const address = ref({
   city: props.modelValue.city || '',
   district: props.modelValue.district || '',
   detail: props.modelValue.detail || '',
+  roomNumber: props.modelValue.roomNumber || '',
   location: props.modelValue.location || { lat: 0, lng: 0 }
 });
 
@@ -196,6 +203,7 @@ watch(() => props.modelValue, (newValue) => {
       city: newValue.city || '',
       district: newValue.district || '',
       detail: newValue.detail || '',
+      roomNumber: newValue.roomNumber || '',
       location: newValue.location || { lat: 0, lng: 0 }
     };
   }
@@ -306,7 +314,7 @@ function handleMapClick(e) {
       const addressComponent = result.regeocode.addressComponent;
       address.value = {
         province: addressComponent.province || '',
-        city: addressComponent.city || '',
+        city: addressComponent.city || addressComponent.province || '',
         district: addressComponent.district || '',
         detail: result.regeocode.formattedAddress || '',
         location: {
@@ -344,7 +352,7 @@ function setMarker(lnglat) {
           const addressComponent = result.regeocode.addressComponent;
           address.value = {
             province: addressComponent.province || '',
-            city: addressComponent.city || '',
+            city: addressComponent.city || addressComponent.province || '',
             district: addressComponent.district || '',
             detail: result.regeocode.formattedAddress || '',
             location: {
@@ -436,7 +444,7 @@ function selectSearchResult(result) {
       const addressComponent = geoResult.regeocode.addressComponent;
       address.value = {
         province: addressComponent.province || '',
-        city: addressComponent.city || '',
+        city: addressComponent.city || addressComponent.province || '',
         district: addressComponent.district || '',
         detail: result.address || '',
         location: result.location
@@ -462,6 +470,7 @@ function resetSelection() {
     city: '',
     district: '',
     detail: '',
+    roomNumber: '',
     location: { lat: 0, lng: 0 }
   };
   

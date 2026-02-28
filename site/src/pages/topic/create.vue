@@ -158,6 +158,7 @@ const postForm = ref({
     city: "",
     district: "",
     detail: "",
+    roomNumber: "",
     location: {
       lat: 0,
       lng: 0
