@@ -91,6 +91,48 @@
               </div>
             </div>
 
+            <!-- 地址信息（如果有） -->
+            <div v-if="topic.location && topic.location.detail" class="topic-location-section">
+              <div class="location-header">
+                <i class="iconfont icon-location"></i>
+                <span class="location-title">位置信息</span>
+              </div>
+              
+              <!-- 地址文本框 -->
+              <div class="location-address-form">
+                <div class="address-row">
+                  <div class="address-field">
+                    <label>省</label>
+                    <el-input v-model="topic.location.province" disabled />
+                  </div>
+                  <div class="address-field">
+                    <label>市</label>
+                    <el-input v-model="topic.location.city" disabled />
+                  </div>
+                  <div class="address-field">
+                    <label>区/县</label>
+                    <el-input v-model="topic.location.district" disabled />
+                  </div>
+                </div>
+                <div class="address-row">
+                  <div class="address-field flex-2">
+                    <label>详细地址</label>
+                    <el-input v-model="topic.location.detail" disabled />
+                  </div>
+                  <div class="address-field flex-1">
+                    <label>房号</label>
+                    <el-input v-model="topic.location.roomNumber" disabled />
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 高德地图 -->
+              <div v-if="topic.location.location && topic.location.location.lat && topic.location.location.lng" 
+                   class="location-map" 
+                   ref="mapContainer">
+              </div>
+            </div>
+
             <!-- 节点、标签 -->
             <div class="topic-tags">
               <nuxt-link
@@ -182,6 +224,12 @@ import { useI18n } from 'vue-i18n';
 
 const route = useRoute();
 const { t } = useI18n();
+
+// 地图相关
+const mapContainer = ref(null);
+let map = null;
+let marker = null;
+let AMapLoader = null;
 
 const { data: topic } = await useMyFetch(`/api/topic/${route.params.id}`);
 
@@ -285,6 +333,73 @@ async function addFavorite(topicId) {
 async function commentCreated() {
   refreshHideContent();
 }
+
+// 初始化地图
+async function initMap() {
+  if (!mapContainer.value || !topic.value?.location?.location) return;
+  
+  const { lat, lng } = topic.value.location.location;
+  if (!lat || !lng) return;
+  
+  // 确保 AMapLoader 已加载
+  if (!AMapLoader) {
+    console.error('AMapLoader 未初始化');
+    return;
+  }
+  
+  try {
+    const AMap = await AMapLoader.load({
+      key: "99d4a2c9bf7a8af7d7c3074aef81c743",
+      version: "2.0",
+      plugins: ['AMap.ToolBar', 'AMap.Scale']
+    });
+    
+    map = new AMap.Map(mapContainer.value, {
+      zoom: 15,
+      center: [lng, lat],
+      resizeEnable: true,
+      zoomEnable: true,
+      dragEnable: true
+    });
+    
+    // 添加标记
+    marker = new AMap.Marker({
+      position: [lng, lat],
+      map: map,
+      draggable: false
+    });
+    
+    // 添加地图控件
+    AMap.plugin(['AMap.ToolBar', 'AMap.Scale'], function() {
+      map.addControl(new AMap.ToolBar());
+      map.addControl(new AMap.Scale());
+    });
+  } catch (error) {
+    console.error('地图初始化失败:', error);
+  }
+}
+
+// 页面挂载后初始化地图
+onMounted(async () => {
+  // 动态导入 AMapLoader（仅在客户端）
+  if (process.client) {
+    const module = await import('@amap/amap-jsapi-loader');
+    AMapLoader = module.default || module;
+  }
+  
+  // 延迟初始化，确保DOM已经渲染
+  setTimeout(() => {
+    initMap();
+  }, 500);
+});
+
+// 页面卸载时销毁地图
+onUnmounted(() => {
+  if (map) {
+    map.destroy();
+    map = null;
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -475,6 +590,83 @@ async function commentCreated() {
         font-size: 14px;
         color: #3273dc;
       }
+    }
+  }
+
+  .topic-location-section {
+    margin: 20px 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(74, 108, 247, 0.05), rgba(106, 17, 203, 0.05));
+    border-radius: 12px;
+    border: 1px solid rgba(74, 108, 247, 0.15);
+
+    .location-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed rgba(74, 108, 247, 0.2);
+
+      i {
+        color: #4a6cf7;
+        font-size: 18px;
+      }
+
+      .location-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+    }
+
+    .location-address-form {
+      margin-bottom: 16px;
+
+      .address-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .address-field {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          &.flex-2 {
+            flex: 2;
+          }
+
+          &.flex-1 {
+            flex: 1;
+          }
+
+          label {
+            font-size: 13px;
+            color: var(--text-color3);
+            font-weight: 500;
+          }
+
+          .el-input {
+            .el-input__wrapper {
+              background: var(--bg-color);
+            }
+          }
+        }
+      }
+    }
+
+    .location-map {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
     }
   }
 

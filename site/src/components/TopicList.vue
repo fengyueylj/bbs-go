@@ -61,6 +61,16 @@
           </ul>
         </template>
       </div>
+      <!-- 地址信息（如果有） -->
+      <div v-if="topic.location && topic.location.detail" class="topic-address">
+        <div class="address-content">
+          <span class="location-label">位置</span>
+          <i class="iconfont icon-location"></i>
+          <span class="address-text">{{ topic.location.detail }}</span>
+          <span v-if="topic.location.roomNumber" class="room-number">{{ topic.location.roomNumber }}</span>
+        </div>
+      </div>
+
       <div class="topic-bottom">
         <div class="topic-tags">
           <nuxt-link
@@ -443,12 +453,61 @@ const toTopicDetail = (topicId) => {
       }
     }
 
+    .topic-address {
+      margin: 0 1.5rem 1rem 1.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-color2);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+
+      .address-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-color2);
+
+        .location-label {
+          background: linear-gradient(135deg, #4a6cf7, #6a11cb);
+          color: white;
+          padding: 3px 10px;
+          border-radius: 4px;
+          font-size: 12px;
+          font-weight: 600;
+          white-space: nowrap;
+          letter-spacing: 1px;
+        }
+
+        i {
+          color: #4a6cf7;
+          font-size: 14px;
+        }
+
+        .address-text {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .room-number {
+          background: var(--bg-color);
+          color: var(--text-color3);
+          padding: 2px 10px;
+          border-radius: 12px;
+          font-size: 12px;
+          font-weight: 500;
+          white-space: nowrap;
+          border: 1px solid var(--border-color);
+        }
+      }
+    }
+
     .topic-bottom {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 1rem 1.5rem;
-      border-top: 1px solid var(--border-color);
       background: linear-gradient(to top, rgba(0, 0, 0, 0.01), transparent);
 
       .topic-tags {
