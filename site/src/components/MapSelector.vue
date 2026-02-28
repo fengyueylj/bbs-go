@@ -131,14 +131,12 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { Loading, Warning, InfoFilled } from '@element-plus/icons-vue';
-import AMapLoader from '@amap/amap-jsapi-loader';
-
-window._AMapSecurityConfig = {
-  securityJsCode: "44f988b928cc85c88e45b278e47a8312",
-};
 
 // 搜索防抖定时器
 let searchTimer = null;
+
+// AMapLoader 实例（客户端动态加载）
+let AMapLoader = null;
 
 const props = defineProps({
   modelValue: {
@@ -207,14 +205,6 @@ function initMap() {
   mapLoading.value = true;
   mapError.value = false;
 
-  // 检查高德地图API是否加载
-  if (typeof AMap === 'undefined') {
-    console.error('高德地图API加载失败，请检查：');
-    mapLoading.value = false;
-    mapError.value = true;
-    return;
-  }
-
   try {
     // 检查mapContainer是否存在
     if (!mapContainer.value) {
@@ -224,13 +214,17 @@ function initMap() {
       return;
     }
 
-    // 使用AMap.plugin加载所需插件
-    AMap.plugin(['AMap.ToolBar', 'AMap.AutoComplete', 'AMap.Scale', 'AMap.PlaceSearch', 'AMap.Geocoder'], function() {
+    // 使用 AMapLoader 加载地图
+    AMapLoader.load({
+      key: "99d4a2c9bf7a8af7d7c3074aef81c743",
+      version: "2.0",
+      plugins: ['AMap.ToolBar', 'AMap.AutoComplete', 'AMap.Scale', 'AMap.PlaceSearch', 'AMap.Geocoder']
+    }).then((AMap) => {
       try {
         // 初始化地图实例
         map.value = new AMap.Map(mapContainer.value, {
           zoom: 13,
-          center: [116.397428, 39.90923], // 默认北京
+          center: [116.397428, 39.90923],
           resizeEnable: true,
           zoomEnable: true,
           dragEnable: true,
@@ -249,14 +243,11 @@ function initMap() {
           console.warn('添加地图控件失败:', controlError);
         }
 
-        // 初始化搜索服务
+        // 初始化搜索服务（不绑定 map 和 panel，手动处理结果）
         placeSearch.value = new AMap.PlaceSearch({
           pageSize: 10,
           pageIndex: 1,
-          city: '全国',
-          map: map.value,
-          panel: "my-panel",
-          autoFitView: true
+          city: '全国'
         });
 
         // 初始化地理编码服务
@@ -290,7 +281,13 @@ function initMap() {
 }
 
 // 初始化地图
-onMounted(() => {
+onMounted(async () => {
+  // 客户端动态导入 AMapLoader
+  if (process.client) {
+    const module = await import('@amap/amap-jsapi-loader');
+    AMapLoader = module.default || module;
+  }
+
   // 延迟初始化，确保DOM已经渲染
   setTimeout(() => {
     initMap();

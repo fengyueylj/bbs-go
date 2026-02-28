@@ -73,13 +73,7 @@ export default defineNuxtConfig({
               securityJsCode: '44f988b928cc85c88e45b278e47a8312'
             };
           `,
-          type: 'text/javascript',
-          async: false
-        },
-        {
-          src: 'https://webapi.amap.com/maps?v=2.0&key=99d4a2c9bf7a8af7d7c3074aef81c743&plugin=AMap.AutoComplete,AMap.PlaceSearch,AMap.Geocoder,AMap.ToolBar,AMap.Scale',
-          type: 'text/javascript',
-          async: false
+          type: 'text/javascript'
         }
       ]
     }
