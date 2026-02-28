@@ -7,6 +7,7 @@ import (
 	"bbs-go/internal/pkg/markdown"
 	"bbs-go/internal/pkg/text"
 	"bbs-go/internal/services"
+	"github.com/mlogclub/simple/common/jsons"
 	"html"
 
 	"github.com/mlogclub/simple/common/arrays"
@@ -72,6 +73,12 @@ func _buildTopic(topic *models.Topic, buildContent bool) *models.TopicResponse {
 	rsp.StickyTime = topic.StickyTime
 	rsp.Status = topic.Status
 	rsp.IpLocation = topic.IpLocation
+
+	// 检查是否有地址
+	rsp.Location = models.TopicLocation{}
+	if topic.ExtraData != "" {
+		jsons.Parse(topic.ExtraData, &rsp.Location)
+	}
 
 	// 构建内容
 	if buildContent {

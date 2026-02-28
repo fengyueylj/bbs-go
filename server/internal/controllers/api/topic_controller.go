@@ -7,6 +7,7 @@ import (
 	"bbs-go/internal/pkg/locales"
 	"bbs-go/internal/pkg/markdown"
 	"bbs-go/internal/spam"
+	"github.com/mlogclub/simple/common/jsons"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -124,6 +125,12 @@ func (c *TopicController) GetEditBy(topicId int64) *web.JsonResult {
 		for _, tag := range tags {
 			tagNames = append(tagNames, tag.Name)
 		}
+	}
+
+	// 检查是否有地址
+	loc := &models.TopicLocation{}
+	if topic.ExtraData != "" {
+		jsons.Parse(topic.ExtraData, loc)
 	}
 
 	return web.NewEmptyRspBuilder().

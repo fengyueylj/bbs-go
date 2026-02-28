@@ -54,6 +54,13 @@ func (s *topicPublishService) Publish(userId int64, form models.CreateTopicForm)
 		}
 	}
 
+	if form.Location.Detail != "" {
+		locationStr, err := jsons.ToStr(form.Location)
+		if err == nil {
+			topic.ExtraData = locationStr
+		}
+	}
+
 	// 检查是否需要审核
 	if s._IsNeedReview(form) {
 		topic.Status = constants.StatusReview
@@ -115,7 +122,7 @@ func (s *topicPublishService) _IsNeedReview(form models.CreateTopicForm) bool {
 	return false
 }
 
-func (s topicPublishService) _CheckParams(form models.CreateTopicForm) (err error) {
+func (s *topicPublishService) _CheckParams(form models.CreateTopicForm) (err error) {
 	modules := SysConfigService.GetModules()
 	if form.Type == constants.TopicTypeTweet {
 		if !modules.Tweet {

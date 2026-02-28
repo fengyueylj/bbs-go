@@ -114,6 +114,7 @@ type TopicResponse struct {
 	Status          int                 `json:"status"`
 	Favorited       bool                `json:"favorited"`
 	IpLocation      string              `json:"ipLocation"`
+	Location        TopicLocation       `json:"location"`
 }
 
 // CommentResponse 评论返回数据
