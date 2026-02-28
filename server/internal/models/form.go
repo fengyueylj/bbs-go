@@ -13,6 +13,19 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+type Location struct {
+	Lat float64 `json:"lat"`
+	Lng float64 `json:"lng"`
+}
+
+type TopicLocation struct {
+	Province   string   `json:"province"`
+	City       string   `json:"city"`
+	District   string   `json:"district"`
+	Detail     string   `json:"detail"`
+	RoomNumber string   `json:"roomNumber"`
+	Location   Location `json:"location"`
+}
 type CreateTopicForm struct {
 	Type        constants.TopicType   `json:"type"`
 	NodeId      int64                 `json:"nodeId"`
@@ -24,6 +37,7 @@ type CreateTopicForm struct {
 	ImageList   []ImageDTO            `json:"imageList"`
 	UserAgent   string                `json:"userAgent"`
 	Ip          string                `json:"ip"`
+	Location    TopicLocation         `json:"location"`
 
 	CaptchaId       string `json:"captchaId"`
 	CaptchaCode     string `json:"captchaCode"`

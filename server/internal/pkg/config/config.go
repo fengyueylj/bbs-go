@@ -42,7 +42,7 @@ var (
 
 func init() {
 	var (
-		configFileName = "bbs-go.yaml"
+		configFileName = "bbs-go." + GetEnv() + ".yaml"
 	)
 	v = viper.New()
 	v.SetConfigFile(configFileName)
