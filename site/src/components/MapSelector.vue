@@ -323,6 +323,7 @@ function handleMapClick(e) {
         }
       };
       emit('update:modelValue', address.value);
+      confirmSelection();
     }
   });
 }
@@ -361,6 +362,7 @@ function setMarker(lnglat) {
             }
           };
           emit('update:modelValue', address.value);
+          confirmSelection();
         }
       });
     });
@@ -450,6 +452,7 @@ function selectSearchResult(result) {
         location: result.location
       };
       emit('update:modelValue', address.value);
+      confirmSelection();
     }
   });
   
@@ -483,6 +486,7 @@ function resetSelection() {
   map.value.setZoom(13);
   
   emit('update:modelValue', address.value);
+  confirmSelection();
 }
 </script>
 
