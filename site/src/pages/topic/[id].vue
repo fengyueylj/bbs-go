@@ -135,6 +135,7 @@
 
             <!-- 节点、标签 -->
             <div class="topic-tags">
+              <!--
               <nuxt-link
                 v-if="topic.node"
                 :to="`/topics/node/${topic.node.id}`"
@@ -142,6 +143,7 @@
               >
                 {{ topic.node.name }}
               </nuxt-link>
+            -->
               <nuxt-link
                 v-for="tag in topic.tags"
                 :key="tag.id"

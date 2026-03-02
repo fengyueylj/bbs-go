@@ -72,6 +72,7 @@
       </div>
 
       <div class="topic-bottom">
+        <!--
         <div class="topic-tags">
           <nuxt-link
             v-if="topic.node"
@@ -84,6 +85,7 @@
             <span>{{ topic.node.name }}</span>
           </nuxt-link>
         </div>
+        -->
 
         <div class="topic-actions">
           <div

@@ -27,6 +27,7 @@
           </div>
         </div>
 
+        <!--
         <div class="topic-tags">
           <div
             v-for="node in nodes"
@@ -38,6 +39,7 @@
             <span>{{ node.name }}</span>
           </div>
         </div>
+      -->
 
         <div v-if="postForm.type === 0" class="editor-container">
           <div class="editor-content">
@@ -132,8 +134,7 @@ const route = useRoute();
 const router = useRouter();
 
 const type = Number.parseInt(route.query.type) || 0;
-const nodeId =
-  parseInt(route.query.nodeId) || configStore.config.defaultNodeId || 0;
+const nodeId = parseInt(route.query.nodeId) || configStore.config.defaultNodeId || 0;
 
 if (type === 1 && !configStore.config.modules.tweet) {
   showError("😱 Tweet module is not enabled");

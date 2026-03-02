@@ -17,6 +17,7 @@
           </div>
         </div>
 
+        <!--
         <div class="topic-tags">
           <div
             v-for="node in nodes"
@@ -28,6 +29,7 @@
             <span>{{ node.name }}</span>
           </div>
         </div>
+      -->
 
         <div class="field">
           <div class="control">
