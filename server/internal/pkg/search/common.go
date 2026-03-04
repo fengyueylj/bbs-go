@@ -19,6 +19,7 @@ type TopicDocument struct {
 	Recommend  bool     `json:"recommend"`
 	Status     int      `json:"status"`
 	CreateTime int64    `json:"createTime"`
+	ExtraData  string   `json:"extraData"`
 }
 
 func (t *TopicDocument) ToStr() string {
@@ -41,6 +42,7 @@ func newIndex(indexPath string) bleve.Index {
 	mapping.DefaultMapping.AddFieldMappingsAt("recommend", newBoolField())
 	mapping.DefaultMapping.AddFieldMappingsAt("status", newNumField())
 	mapping.DefaultMapping.AddFieldMappingsAt("createTime", newNumField())
+	mapping.DefaultMapping.AddFieldMappingsAt("extraData", newNumField())
 
 	index, err := bleve.New(indexPath, mapping)
 	if err != nil {

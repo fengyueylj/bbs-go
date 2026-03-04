@@ -52,7 +52,7 @@ func (c *TopicController) _GetBuiltInNodes() []models.NodeResponse {
 func (c *TopicController) GetNode_navs() *web.JsonResult {
 	nodes := append(
 		c._GetBuiltInNodes(),
-		render.BuildNodes(services.TopicNodeService.GetNodes())...,
+		//render.BuildNodes(services.TopicNodeService.GetNodes())...,
 	)
 	return web.JsonData(nodes)
 }
@@ -80,7 +80,7 @@ func (c *TopicController) GetNode() *web.JsonResult {
 	return web.JsonData(render.BuildNode(node))
 }
 
-// 发表帖子
+// PostCreate 发表帖子
 func (c *TopicController) PostCreate() *web.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if err := services.UserService.CheckPostStatus(user); err != nil {
@@ -99,7 +99,7 @@ func (c *TopicController) PostCreate() *web.JsonResult {
 	return web.JsonData(render.BuildSimpleTopic(topic))
 }
 
-// 编辑时获取详情
+// GetEditBy 编辑时获取详情
 func (c *TopicController) GetEditBy(topicId int64) *web.JsonResult {
 	user := services.UserTokenService.GetCurrent(c.Ctx)
 	if err := services.UserService.CheckPostStatus(user); err != nil {

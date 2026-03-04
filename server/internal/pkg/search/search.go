@@ -46,13 +46,13 @@ func NewTopicDoc(topic *models.Topic) *TopicDocument {
 		Status:     topic.Status,
 		Recommend:  topic.Recommend,
 		CreateTime: topic.CreateTime,
+		ExtraData:  topic.ExtraData,
 	}
 
 	// 处理内容
 	content := markdown.ToHTML(topic.Content)
 	content = html2.GetHtmlText(content)
 	content = html.EscapeString(content)
-
 	doc.Content = content
 
 	// 处理用户
