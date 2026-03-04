@@ -112,7 +112,7 @@ const changeSelect = (delta) => {
   }
   let index = data.selectedIndex + delta;
   if (index < 0) {
-    // 选中熬第一个了，再往上取消选中
+    // 选中第一个了，再往上取消选中
     index = -1;
   } else if (index >= histories.value.length) {
     // 选中到最后了，再往下就回到第一个

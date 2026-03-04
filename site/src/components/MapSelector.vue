@@ -70,7 +70,7 @@
         </el-col>
         <el-col :span="6">
           <el-form-item label="具体房号">
-            <el-input v-model="address.roomNumber" placeholder="请输入具体房号" />
+            <el-input v-model="address.roomNumber" placeholder="请输入具体房号" @change="confirmSelection" />
           </el-form-item>
         </el-col>
       </el-row>
@@ -463,6 +463,10 @@ function selectSearchResult(result) {
 
 // 确认选择
 function confirmSelection() {
+  if (!address.value.roomNumber && resultSelected.value && searchKeyword.value.trim() != '') {
+    address.value.roomNumber = searchKeyword.value + (address.value.roomNumber || '');
+  }
+
   emit('confirm', address.value);
 }
 
