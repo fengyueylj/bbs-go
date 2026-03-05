@@ -4,6 +4,7 @@ import (
 	"bbs-go/internal/models/constants"
 	"bbs-go/internal/pkg/event"
 	"bbs-go/internal/pkg/search"
+	"encoding/json"
 	"errors"
 	"math"
 	"net/http"
@@ -113,7 +114,7 @@ func (s *topicService) Undelete(id int64) error {
 }
 
 // 更新
-func (s *topicService) Edit(topicId, nodeId int64, tags []string, title, content, hideContent string) error {
+func (s *topicService) Edit(topicId, nodeId int64, tags []string, title, content, hideContent string, location *models.TopicLocation) error {
 	if len(title) == 0 {
 		return errors.New("标题不能为空")
 	}
@@ -127,17 +128,32 @@ func (s *topicService) Edit(topicId, nodeId int64, tags []string, title, content
 		return errors.New("节点不存在")
 	}
 
+	// 处理location数据
+	var extraData string
+	if location != nil && (strs.IsNotBlank(location.Province) || strs.IsNotBlank(location.City) ||
+		strs.IsNotBlank(location.District) || strs.IsNotBlank(location.Detail) ||
+		location.Location.Lat != 0 || location.Location.Lng != 0) {
+		extraDataBytes, err := json.Marshal(location)
+		if err == nil {
+			extraData = string(extraDataBytes)
+		}
+	}
+
 	err := sqls.DB().Transaction(func(tx *gorm.DB) error {
 		var (
 			tagIds []int64
 			err    error
 		)
-		if err = repositories.TopicRepository.Updates(sqls.DB(), topicId, map[string]interface{}{
+		updateData := map[string]interface{}{
 			"node_id":      nodeId,
 			"title":        title,
 			"content":      content,
 			"hide_content": hideContent,
-		}); err != nil {
+		}
+		if strs.IsNotBlank(extraData) {
+			updateData["extra_data"] = extraData
+		}
+		if err = repositories.TopicRepository.Updates(sqls.DB(), topicId, updateData); err != nil {
 			return err
 		}
 

@@ -103,6 +103,8 @@ export function useJsonToForm(json: Record<string, any>): FormData {
   for (const [key, value] of Object.entries(json)) {
     if (Array.isArray(value)) {
       value.forEach((item) => formData.append(`${key}[]`, item));
+    } else if (typeof value === 'object' && value !== null) {
+      formData.append(key, JSON.stringify(value));
     } else {
       formData.append(key, value);
     }

@@ -10,11 +10,13 @@ import (
 	"html"
 	"log/slog"
 	"math"
+	"os"
 	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	"github.com/mitchellh/mapstructure"
 	"github.com/mlogclub/simple/common/dates"
+	"github.com/mlogclub/simple/common/jsons"
 	"github.com/mlogclub/simple/common/strs"
 	"github.com/mlogclub/simple/sqls"
 	"github.com/spf13/cast"
@@ -29,7 +31,13 @@ func Init() {
 		if err == bleve.ErrorIndexPathDoesNotExist {
 			index = newIndex(indexPath)
 		} else {
-			slog.Error(err.Error())
+			// Index exists but is corrupted/missing metadata, recreate it
+			slog.Warn("Index open failed, recreating index", slog.String("path", indexPath), slog.String("err", err.Error()))
+			if removeErr := os.RemoveAll(indexPath); removeErr != nil {
+				slog.Error("Failed to remove corrupted index", slog.Any("err", removeErr))
+			} else {
+				index = newIndex(indexPath)
+			}
 		}
 	}
 }
@@ -46,7 +54,6 @@ func NewTopicDoc(topic *models.Topic) *TopicDocument {
 		Status:     topic.Status,
 		Recommend:  topic.Recommend,
 		CreateTime: topic.CreateTime,
-		ExtraData:  topic.ExtraData,
 	}
 
 	// 处理内容
@@ -69,6 +76,16 @@ func NewTopicDoc(topic *models.Topic) *TopicDocument {
 	}
 	tagsArr = append(tagsArr, "hello")
 	doc.Tags = tagsArr
+
+	// 处理地理位置信息
+	if topic.ExtraData != "" {
+		var location models.TopicLocation
+		if err := jsons.Parse(topic.ExtraData, &location); err == nil {
+			doc.District = location.District
+			doc.Detail = location.Detail
+			doc.RoomNumber = location.RoomNumber
+		}
+	}
 
 	return doc
 }
@@ -109,7 +126,23 @@ func SearchTopic(keyword string, nodeId int64, timeRange, page, limit int) (docs
 	query.AddMust(bleve.NewMatchAllQuery())
 
 	if strs.IsNotBlank(keyword) {
-		query.AddMust(bleve.NewMatchQuery(keyword))
+		//query.AddMust(bleve.NewMatchQuery(keyword))
+		// 多字段搜索：title、content、extraData、地理位置字段
+		titleQuery := bleve.NewMatchQuery(keyword)
+		titleQuery.SetField("title")
+		contentQuery := bleve.NewMatchQuery(keyword)
+		contentQuery.SetField("content")
+		extraDataQuery := bleve.NewMatchQuery(keyword)
+		extraDataQuery.SetField("extraData")
+		// 地理位置字段查询
+		districtQuery := bleve.NewMatchQuery(keyword)
+		districtQuery.SetField("district")
+		detailQuery := bleve.NewMatchQuery(keyword)
+		detailQuery.SetField("detail")
+		roomNumberQuery := bleve.NewMatchQuery(keyword)
+		roomNumberQuery.SetField("roomNumber")
+		multiQuery := bleve.NewDisjunctionQuery(titleQuery, contentQuery, extraDataQuery, districtQuery, detailQuery, roomNumberQuery)
+		query.AddMust(multiQuery)
 	}
 
 	if nodeId != 0 {
@@ -185,10 +218,11 @@ func SearchTopic(keyword string, nodeId int64, timeRange, page, limit int) (docs
 
 		var doc TopicDocument
 		if err := mapstructure.Decode(storedDoc, &doc); err != nil {
-			slog.Error(err.Error())
+			slog.Error("解码文档失败:", slog.Any("err", err))
+			continue
 		}
 		docs = append(docs, doc)
 	}
 
-	return
+	return docs, paging, err
 }

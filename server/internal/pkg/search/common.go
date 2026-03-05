@@ -19,7 +19,10 @@ type TopicDocument struct {
 	Recommend  bool     `json:"recommend"`
 	Status     int      `json:"status"`
 	CreateTime int64    `json:"createTime"`
-	ExtraData  string   `json:"extraData"`
+	// 地理位置字段
+	District   string `json:"district"`
+	Detail     string `json:"detail"`
+	RoomNumber string `json:"roomNumber"`
 }
 
 func (t *TopicDocument) ToStr() string {
@@ -42,7 +45,10 @@ func newIndex(indexPath string) bleve.Index {
 	mapping.DefaultMapping.AddFieldMappingsAt("recommend", newBoolField())
 	mapping.DefaultMapping.AddFieldMappingsAt("status", newNumField())
 	mapping.DefaultMapping.AddFieldMappingsAt("createTime", newNumField())
-	mapping.DefaultMapping.AddFieldMappingsAt("extraData", newNumField())
+	// 地理位置字段映射
+	mapping.DefaultMapping.AddFieldMappingsAt("district", newTextField())
+	mapping.DefaultMapping.AddFieldMappingsAt("detail", newTextField())
+	mapping.DefaultMapping.AddFieldMappingsAt("roomNumber", newTextField())
 
 	index, err := bleve.New(indexPath, mapping)
 	if err != nil {
@@ -52,26 +58,37 @@ func newIndex(indexPath string) bleve.Index {
 }
 
 func newTextField() *mapping.FieldMapping {
-	textField := bleve.NewTextFieldMapping()
-	// textField.Store = true
-	textField.Index = true
-	textField.IncludeTermVectors = true
-	textField.Analyzer = "en"
-	return textField
+	/*
+		textField := bleve.NewTextFieldMapping()
+		// textField.Store = true
+		textField.Index = true
+		textField.IncludeTermVectors = true
+		textField.Analyzer = "en"
+		return textField
+	*/
+	fm := bleve.NewTextFieldMapping()
+	fm.Analyzer = "cjk"
+	return fm
 }
 
 func newNumField() *mapping.FieldMapping {
-	numField := bleve.NewNumericFieldMapping()
-	// numField.Store = true
-	numField.Index = true
-	numField.DocValues = true
-	return numField
+	/*
+		numField := bleve.NewNumericFieldMapping()
+		// numField.Store = true
+		numField.Index = true
+		numField.DocValues = true
+		return numField
+	*/
+	return bleve.NewNumericFieldMapping()
 }
 
 func newBoolField() *mapping.FieldMapping {
-	boolField := bleve.NewBooleanFieldMapping()
-	// boolField.Store = true
-	boolField.Index = true
-	boolField.DocValues = true
-	return boolField
+	/*
+		boolField := bleve.NewBooleanFieldMapping()
+		// boolField.Store = true
+		boolField.Index = true
+		boolField.DocValues = true
+		return boolField
+	*/
+	return bleve.NewBooleanFieldMapping()
 }

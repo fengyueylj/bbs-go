@@ -42,6 +42,16 @@
           </div>
         </div>
 
+        <!-- 地理位置选择 -->
+        <div class="editor-container">
+          <div class="editor-title">
+            <span>地理位置信息</span>
+          </div>
+          <div class="editor-content">
+            <MapSelector v-model="location" @confirm="handleLocationConfirm" />
+          </div>
+        </div>
+
         <div class="field">
           <div class="control">
             <markdown-editor
@@ -94,6 +104,7 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n';
+import MapSelector from "~/components/MapSelector.vue";
 const { t } = useI18n();
 
 definePageMeta({
@@ -112,10 +123,44 @@ const isEnableHideContent = computed(() => {
 });
 
 const { data: nodes } = await useMyFetch("/api/topic/nodes");
-const { data: postForm } = await useMyFetch(
-  `/api/topic/edit/${route.params.id}`
-);
+const { data: postForm } = await useMyFetch(`/api/topic/edit/${route.params.id}`);
 const publishing = ref(false);
+
+// 地理位置数据
+const location = ref({
+  province: "",
+  city: "",
+  district: "",
+  detail: "",
+  roomNumber: "",
+  location: {
+    lat: 0,
+    lng: 0
+  }
+});
+
+// 处理地理位置确认
+function handleLocationConfirm(loc) {
+  location.value = loc;
+  console.log('地理位置已确认:', loc);
+}
+
+// 从postForm加载地理位置数据
+watch(() => postForm.value, (newValue) => {
+  if (newValue && newValue.location) {
+    location.value = {
+      province: newValue.location.province || "",
+      city: newValue.location.city || "",
+      district: newValue.location.district || "",
+      detail: newValue.location.detail || "",
+      roomNumber: newValue.location.roomNumber || "",
+      location: {
+        lat: newValue.location.location?.lat || 0,
+        lng: newValue.location.location?.lng || 0
+      }
+    };
+  }
+}, { immediate: true });
 
 const switchEditor = () => {
   useConfirm(t('pages.topic.edit.switchEditorConfirm'), {
@@ -148,6 +193,7 @@ async function submitCreate() {
         content: postForm.value.content,
         hideContent: postForm.value.hideContent,
         tags: postForm.value.tags ? postForm.value.tags.join(",") : "",
+        location: location.value,
       })
     );
     useMsg({
@@ -163,4 +209,32 @@ async function submitCreate() {
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+/* 编辑器容器样式 */
+.editor-container {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* 编辑器标题样式 */
+.editor-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e4e7ed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 编辑器内容样式 */
+.editor-content {
+  width: 100%;
+}
+</style>

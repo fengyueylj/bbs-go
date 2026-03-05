@@ -8,6 +8,7 @@ import (
 	"bbs-go/internal/pkg/markdown"
 	"bbs-go/internal/spam"
 	"github.com/mlogclub/simple/common/jsons"
+	"log/slog"
 	"math/rand"
 	"strconv"
 	"strings"
@@ -141,6 +142,7 @@ func (c *TopicController) GetEditBy(topicId int64) *web.JsonResult {
 		Put("contentType", topic.ContentType).
 		Put("hideContent", topic.HideContent).
 		Put("tags", tagNames).
+		Put("location", loc).
 		JsonResult()
 }
 
@@ -169,7 +171,16 @@ func (c *TopicController) PostEditBy(topicId int64) *web.JsonResult {
 		tags        = params.FormValueStringArray(c.Ctx, "tags")
 	)
 
-	err := services.TopicService.Edit(topicId, nodeId, tags, title, content, hideContent)
+	// 获取location对象
+	var location models.TopicLocation
+	locationStr := params.FormValue(c.Ctx, "location")
+	if strs.IsNotBlank(locationStr) {
+		if err := jsons.Parse(locationStr, &location); err != nil {
+			slog.Error("解析location失败", slog.Any("err", err))
+		}
+	}
+
+	err := services.TopicService.Edit(topicId, nodeId, tags, title, content, hideContent, &location)
 	if err != nil {
 		return web.JsonError(err)
 	}
