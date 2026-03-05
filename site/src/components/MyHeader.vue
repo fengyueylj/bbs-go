@@ -66,6 +66,7 @@
             :key="index"
             :to="nav.url"
             class="navbar-item"
+            active-class="nav-item-active"
           >
             {{ nav.title }}
           </nuxt-link>
@@ -216,6 +217,16 @@ function getNodeIconClass(nodeId) {
 
   .navbar-item:hover {
     background-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .navbar-item.nav-item-active {
+    background-color: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
+  }
+
+  .navbar-item.nav-item-active:hover {
+    background-color: rgba(255, 255, 255, 0.35);
   }
 
   /* 调整箭头位置 */
