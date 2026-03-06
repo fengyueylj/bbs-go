@@ -9,7 +9,7 @@
         <div class="donate-content">
           <div class="qrcode-section">
             <div class="qrcode-container">
-              <img src="https://via.placeholder.com/300x300?text=微信收款码" alt="微信收款码" class="qrcode-image" />
+              <img src="~/assets/images/donate.jpg" alt="微信打赏码" class="qrcode-image" />
             </div>
             <div class="qrcode-description">
               <p class="donate-text">感谢您的支持与打赏！</p>

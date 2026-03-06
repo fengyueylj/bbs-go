@@ -594,6 +594,11 @@ export default {
       community: "交流社区：",
       docs: "官方文档：",
     },
+    donate: {
+      title: "打赏",
+      thanks: "您的支持与理解是对我最大的鼓舞！",
+      appreciation: "再次感谢！！！",
+    }
   },
   composables: {
     justNow: "刚刚",
