@@ -70,6 +70,7 @@ type Config struct {
 	Search         SearchConfig   `yaml:"search"`         // 搜索配置
 	BaiduSEO       BaiduSEOConfig `yaml:"baiduSEO"`       // 百度SEO配置
 	SmSEO          SmSEOConfig    `yaml:"smSEO"`          // 神马搜索SEO配置
+	Uploader       UploadConfig   `json:"uploader"`       // 上传配置
 }
 
 type LoggerConfig struct {
@@ -104,6 +105,39 @@ type SmSEOConfig struct {
 	Site     string `yaml:"site"`
 	UserName string `yaml:"userName"`
 	Token    string `yaml:"token"`
+}
+
+type UploadMethod string
+
+const (
+	AliyunOss  UploadMethod = "aliyunOss"
+	TencentCos UploadMethod = "tencentCos"
+)
+
+type UploadConfig struct {
+	EnableUploadMethod UploadMethod           `json:"enableUploadMethod"`
+	AliyunOss          AliyunOssUploadConfig  `json:"aliyunOss"`
+	TencentCos         TencentCosUploadConfig `json:"tencentCos"`
+}
+
+type AliyunOssUploadConfig struct {
+	Host          string `json:"host"`
+	Bucket        string `json:"bucket"`
+	Endpoint      string `json:"endpoint"`
+	AccessId      string `json:"accessId"`
+	AccessSecret  string `json:"accessSecret"`
+	StyleSplitter string `json:"styleSplitter"`
+	StyleAvatar   string `json:"styleAvatar"`
+	StylePreview  string `json:"stylePreview"`
+	StyleSmall    string `json:"styleSmall"`
+	StyleDetail   string `json:"styleDetail"`
+}
+
+type TencentCosUploadConfig struct {
+	Bucket    string `json:"bucket"`
+	Region    string `json:"region"`
+	SecretId  string `json:"secretId"`
+	SecretKey string `json:"secretKey"`
 }
 
 func ReadConfig() (cfg *Config, exists bool, err error) {
@@ -194,4 +228,8 @@ func getLogFilename() string {
 	// 	return ""
 	// }
 	return filepath.Join("./", "logs", "bbs-go.log")
+}
+
+func GetUploadConfig() *UploadConfig {
+	return &Instance.Uploader
 }

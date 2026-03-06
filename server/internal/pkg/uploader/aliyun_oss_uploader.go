@@ -1,8 +1,8 @@
 package uploader
 
 import (
-	"bbs-go/internal/models/dto"
 	"bbs-go/internal/pkg/bbsurls"
+	"bbs-go/internal/pkg/config"
 	"bytes"
 	"log/slog"
 	"sync"
@@ -17,7 +17,7 @@ type AliyunOssUploader struct {
 	bucket *oss.Bucket
 }
 
-func (u *AliyunOssUploader) PutImage(cfg *dto.UploadConfig, data []byte, contentType string) (string, error) {
+func (u *AliyunOssUploader) PutImage(cfg *config.UploadConfig, data []byte, contentType string) (string, error) {
 	if strs.IsBlank(contentType) {
 		contentType = "image/jpeg"
 	}
@@ -25,7 +25,7 @@ func (u *AliyunOssUploader) PutImage(cfg *dto.UploadConfig, data []byte, content
 	return u.PutObject(cfg, key, data, contentType)
 }
 
-func (u *AliyunOssUploader) PutObject(cfg *dto.UploadConfig, key string, data []byte, contentType string) (string, error) {
+func (u *AliyunOssUploader) PutObject(cfg *config.UploadConfig, key string, data []byte, contentType string) (string, error) {
 	if err := u.initBucket(cfg); err != nil {
 		return "", err
 	}
@@ -39,7 +39,7 @@ func (u *AliyunOssUploader) PutObject(cfg *dto.UploadConfig, key string, data []
 	return bbsurls.UrlJoin(cfg.AliyunOss.Host, key), nil
 }
 
-func (u *AliyunOssUploader) CopyImage(cfg *dto.UploadConfig, originUrl string) (string, error) {
+func (u *AliyunOssUploader) CopyImage(cfg *config.UploadConfig, originUrl string) (string, error) {
 	data, contentType, err := download(originUrl)
 	if err != nil {
 		return "", err
@@ -47,7 +47,7 @@ func (u *AliyunOssUploader) CopyImage(cfg *dto.UploadConfig, originUrl string) (
 	return u.PutImage(cfg, data, contentType)
 }
 
-func (u *AliyunOssUploader) initBucket(cfg *dto.UploadConfig) error {
+func (u *AliyunOssUploader) initBucket(cfg *config.UploadConfig) error {
 	if !u.isCfgChange(cfg) {
 		return nil
 	}
@@ -56,7 +56,7 @@ func (u *AliyunOssUploader) initBucket(cfg *dto.UploadConfig) error {
 	defer u.m.Unlock()
 
 	if cfg != nil {
-		client, err := oss.New(cfg.AliyunOss.Endpoint, cfg.AliyunOss.AccessKeyId, cfg.AliyunOss.AccessKeySecret)
+		client, err := oss.New(cfg.AliyunOss.Endpoint, cfg.AliyunOss.AccessId, cfg.AliyunOss.AccessSecret)
 		if err != nil {
 			slog.Error(err.Error(), slog.Any("err", err))
 			return err
@@ -73,14 +73,14 @@ func (u *AliyunOssUploader) initBucket(cfg *dto.UploadConfig) error {
 	return nil
 }
 
-func (u *AliyunOssUploader) isCfgChange(cfg *dto.UploadConfig) bool {
+func (u *AliyunOssUploader) isCfgChange(cfg *config.UploadConfig) bool {
 	if cfg == nil || u.bucket == nil {
 		return true
 	}
 
 	if u.bucket.Client.Config.Endpoint != cfg.AliyunOss.Endpoint ||
-		u.bucket.Client.Config.AccessKeyID != cfg.AliyunOss.AccessKeyId ||
-		u.bucket.Client.Config.AccessKeySecret != cfg.AliyunOss.AccessKeySecret ||
+		u.bucket.Client.Config.AccessKeyID != cfg.AliyunOss.AccessId ||
+		u.bucket.Client.Config.AccessKeySecret != cfg.AliyunOss.AccessSecret ||
 		u.bucket.BucketName != cfg.AliyunOss.Bucket {
 		return true
 	}

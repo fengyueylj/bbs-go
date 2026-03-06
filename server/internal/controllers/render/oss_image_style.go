@@ -1,40 +1,39 @@
 package render
 
 import (
-	"bbs-go/internal/models/dto"
-	"bbs-go/internal/services"
+	"bbs-go/internal/pkg/config"
 	"strings"
 
 	"github.com/mlogclub/simple/common/strs"
 )
 
 func HandleOssImageStyleAvatar(url string) string {
-	cfg := services.SysConfigService.GetUploadConfig()
-	if cfg.EnableUploadMethod != dto.AliyunOss {
+	cfg := config.GetUploadConfig()
+	if cfg.EnableUploadMethod != config.AliyunOss {
 		return url
 	}
 	return HandleOssImageStyle(url, cfg.AliyunOss.StyleSplitter, cfg.AliyunOss.StyleAvatar)
 }
 
 func HandleOssImageStyleDetail(url string) string {
-	cfg := services.SysConfigService.GetUploadConfig()
-	if cfg.EnableUploadMethod != dto.AliyunOss {
+	cfg := config.GetUploadConfig()
+	if cfg.EnableUploadMethod != config.AliyunOss {
 		return url
 	}
 	return HandleOssImageStyle(url, cfg.AliyunOss.StyleSplitter, cfg.AliyunOss.StyleDetail)
 }
 
 func HandleOssImageStyleSmall(url string) string {
-	cfg := services.SysConfigService.GetUploadConfig()
-	if cfg.EnableUploadMethod != dto.AliyunOss {
+	cfg := config.GetUploadConfig()
+	if cfg.EnableUploadMethod != config.AliyunOss {
 		return url
 	}
 	return HandleOssImageStyle(url, cfg.AliyunOss.StyleSplitter, cfg.AliyunOss.StyleSmall)
 }
 
 func HandleOssImageStylePreview(url string) string {
-	cfg := services.SysConfigService.GetUploadConfig()
-	if cfg.EnableUploadMethod != dto.AliyunOss {
+	cfg := config.GetUploadConfig()
+	if cfg.EnableUploadMethod != config.AliyunOss {
 		return url
 	}
 	return HandleOssImageStyle(url, cfg.AliyunOss.StyleSplitter, cfg.AliyunOss.StylePreview)

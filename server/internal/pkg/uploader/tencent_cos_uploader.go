@@ -1,6 +1,7 @@
 package uploader
 
 import (
+	"bbs-go/internal/pkg/config"
 	"bytes"
 	"context"
 	"fmt"
@@ -11,18 +12,16 @@ import (
 	"github.com/tencentyun/cos-go-sdk-v5"
 
 	"github.com/mlogclub/simple/common/strs"
-
-	"bbs-go/internal/models/dto"
 )
 
 // 腾讯云cos
 type TencentCosUploader struct {
 	m          sync.Mutex
 	client     *cos.Client
-	currentCfg dto.UploadConfig
+	currentCfg config.UploadConfig
 }
 
-func (u *TencentCosUploader) PutImage(cfg *dto.UploadConfig, data []byte, contentType string) (string, error) {
+func (u *TencentCosUploader) PutImage(cfg *config.UploadConfig, data []byte, contentType string) (string, error) {
 	if strs.IsBlank(contentType) {
 		contentType = "image/jpeg"
 	}
@@ -30,7 +29,7 @@ func (u *TencentCosUploader) PutImage(cfg *dto.UploadConfig, data []byte, conten
 	return u.PutObject(cfg, key, data, contentType)
 }
 
-func (u *TencentCosUploader) PutObject(cfg *dto.UploadConfig, key string, data []byte, contentType string) (string, error) {
+func (u *TencentCosUploader) PutObject(cfg *config.UploadConfig, key string, data []byte, contentType string) (string, error) {
 	if err := u.initClient(cfg); err != nil {
 		return "", nil
 	}
@@ -47,7 +46,7 @@ func (u *TencentCosUploader) PutObject(cfg *dto.UploadConfig, key string, data [
 	return fmt.Sprintf("%s/%s", u.client.BaseURL.BucketURL, key), nil
 }
 
-func (u *TencentCosUploader) CopyImage(cfg *dto.UploadConfig, originUrl string) (string, error) {
+func (u *TencentCosUploader) CopyImage(cfg *config.UploadConfig, originUrl string) (string, error) {
 	data, contentType, err := download(originUrl)
 	if err != nil {
 		return "", err
@@ -55,7 +54,7 @@ func (u *TencentCosUploader) CopyImage(cfg *dto.UploadConfig, originUrl string) 
 	return u.PutImage(cfg, data, contentType)
 }
 
-func (u *TencentCosUploader) initClient(cfg *dto.UploadConfig) error {
+func (u *TencentCosUploader) initClient(cfg *config.UploadConfig) error {
 	if !u.isCfgChange(cfg) {
 		return nil
 	}
@@ -79,7 +78,7 @@ func (u *TencentCosUploader) initClient(cfg *dto.UploadConfig) error {
 	return nil
 }
 
-func (u *TencentCosUploader) isCfgChange(cfg *dto.UploadConfig) bool {
+func (u *TencentCosUploader) isCfgChange(cfg *config.UploadConfig) bool {
 	if cfg == nil || u.client == nil {
 		return true
 	}

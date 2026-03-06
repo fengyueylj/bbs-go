@@ -1,7 +1,6 @@
 package uploader
 
 import (
-	"bbs-go/internal/models/dto"
 	"bbs-go/internal/pkg/config"
 	"mime"
 	"time"
@@ -13,9 +12,9 @@ import (
 )
 
 type Uploader interface {
-	PutImage(cfg *dto.UploadConfig, data []byte, contentType string) (string, error)
-	PutObject(cfg *dto.UploadConfig, key string, data []byte, contentType string) (string, error)
-	CopyImage(cfg *dto.UploadConfig, originUrl string) (string, error)
+	PutImage(cfg *config.UploadConfig, data []byte, contentType string) (string, error)
+	PutObject(cfg *config.UploadConfig, key string, data []byte, contentType string) (string, error)
+	CopyImage(cfg *config.UploadConfig, originUrl string) (string, error)
 }
 
 // generateKey 生成图片Key

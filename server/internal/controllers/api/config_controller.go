@@ -18,7 +18,6 @@ func (c *ConfigController) GetConfigs() *web.JsonResult {
 	var b *web.RspBuilder
 	if cfg.Installed {
 		sysConfig := services.SysConfigService.GetConfig()
-		sysConfig.UploadConfig = nil
 		b = web.NewRspBuilder(sysConfig)
 	} else {
 		b = web.NewEmptyRspBuilder()
