@@ -557,6 +557,10 @@ export default {
         editSuccess: "修改成功",
         editFailed: "提交失败：",
       },
+      detail: {
+        pending: "这篇文章正在审核中",
+        publishedAt: "发布于",
+      }
     },
     error: {
       notFound: "页面没找到",

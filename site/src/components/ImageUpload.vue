@@ -66,7 +66,7 @@ const props = defineProps({
   },
   limit: {
     type: Number,
-    default: 9,
+    default: 3,
   },
   sizeLimit: {
     type: Number,
