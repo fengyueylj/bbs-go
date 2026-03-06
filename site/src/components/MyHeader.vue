@@ -70,6 +70,14 @@
           >
             {{ nav.title }}
           </nuxt-link>
+
+          <!-- 打赏按钮 -->
+          <div class="navbar-item" style="display: flex; align-items: center; justify-content: center;">
+            <nuxt-link to="/donate" class="donate-btn">
+              <i class="iconfont icon-heart"></i>
+              <span>{{ $t("common.header.donate") }}</span>
+            </nuxt-link>
+          </div>
         </div>
 
         <div class="navbar-end">
@@ -275,6 +283,102 @@ function getNodeIconClass(nodeId) {
       background-color: rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  /* 打赏按钮样式 */
+  .donate-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: white;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 15px;
+    font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    letter-spacing: 0.5px;
+    line-height: 1;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: center;
+    
+    /* 闪光效果 */
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 2.5s infinite;
+      pointer-events: none;
+    }
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(255, 107, 107, 0.6);
+      background: linear-gradient(135deg, #ff5252, #ff4081);
+    }
+    
+    &:active {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+    }
+    
+    i {
+      font-size: 16px;
+      animation: pulse 2s infinite;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    span {
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    
+    &:hover span {
+      transform: scale(1.05);
+    }
+  }
+  
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) rotate(30deg);
+    }
+    100% {
+      transform: translateX(100%) rotate(30deg);
+    }
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
     }
   }
 }

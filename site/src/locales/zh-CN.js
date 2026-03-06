@@ -20,6 +20,7 @@ export default {
       logout: "退出登录",
       login: "登录",
       confirmLogout: "确定退出登录吗？",
+      donate: "打赏",
     },
   },
   layout: {
@@ -223,7 +224,7 @@ export default {
         liked: "已点在",
         uliked: "已取消点赞",
         favoriteSuccess: "收藏成功",
-        ufavoriteSuccess:"已取消收藏",
+        ufavoriteSuccess: "已取消收藏",
       },
     },
     setEmailDialog: {

@@ -20,6 +20,7 @@ export default {
       logout: "Sign out",
       login: "Sign in",
       confirmLogout: "Are you sure you want to logout?",
+      donate: "Donate",
     },
   },
   layout: {
@@ -224,7 +225,7 @@ export default {
         liked: "Liked!",
         uliked: "Cancel Liked!",
         favoriteSuccess: "favorite Success!",
-        ufavoriteSuccess:"Cancel favorite",
+        ufavoriteSuccess: "Cancel favorite",
       },
     },
     setEmailDialog: {
